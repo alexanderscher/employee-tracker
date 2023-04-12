@@ -15,7 +15,7 @@ VALUES
 ('Data Scientist', 145000.00, 4)
 
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUES
 ('Jasmine', 'Nguyen', 1, 1),
 ('Nathan', 'Brown', 2, 3),

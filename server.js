@@ -1,15 +1,15 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-const cTable = require("console.table");
+require("dotenv").config();
 
 const PORT = process.env.PORT || 3001;
 
 const db = mysql.createConnection({
   host: "localhost",
   port: 3306,
-  user: "root",
-  password: "alexscher",
-  database: "employeeTracker_db",
+  user: process.env.DB_PASSWORD,
+  password: process.env.DB_USER,
+  database: process.env.DB_NAME,
 });
 
 function viewDepartments() {
