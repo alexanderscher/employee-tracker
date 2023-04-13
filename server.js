@@ -12,11 +12,70 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
+db.connect((err) => {
+  if (err) throw err;
+  console.log("Connected to the database!");
+  // start the application
+  run();
+});
+
+function run() {
+  inquirer
+    .prompt({
+      type: "list",
+      name: "action",
+      message: "What would you like to do?",
+      choices: [
+        "View all departments",
+        "View all roles",
+        "View all employees",
+        "Add a department",
+        "Add a role",
+        "Add an employee",
+        "Add a Manager",
+        "Update an employee role",
+        "View Employees by Manager",
+        "View Employees by Department",
+        "Delete Departments | Roles | Employees",
+        "View the total utilized budget of a department",
+        "Exit",
+      ],
+    })
+    .then((answer) => {
+      switch (answer.action) {
+        case "View all departments":
+          viewDepartments();
+          break;
+        case "View all roles":
+          viewRoles();
+          break;
+        case "View all employees":
+          viewEmployees();
+          break;
+        case "Add a department":
+          addDepartment();
+          break;
+        case "Add a role":
+          addRole();
+          break;
+        case "Add an employee":
+          addEmployee();
+          break;
+        case "Update an employee role":
+          updateRole();
+          break;
+        case "Exit":
+          connection.end();
+          break;
+      }
+    });
+}
 function viewDepartments() {
   const query = "SELECT * FROM departments";
   db.query(query, (err, results) => {
     if (err) throw err;
     console.table(results);
+    run();
   });
 }
 
@@ -26,6 +85,7 @@ function viewRoles() {
   db.query(query, (err, results) => {
     if (err) throw err;
     console.table(results);
+    run();
   });
 }
 
@@ -40,6 +100,7 @@ function viewEmployees() {
   db.query(query, (err, results) => {
     if (err) throw err;
     console.table(results);
+    run();
   });
 }
 
@@ -54,7 +115,8 @@ function addDepartment() {
       const query = `INSERT INTO departments (name) VALUES ('${answer.name}')`;
       db.query(query, (err, res) => {
         if (err) throw err;
-        console.log(`Added department ${answer.name} to the database!`);
+        console.log(`Added department ${answer.name} to the database`);
+        run();
       });
     });
 }
@@ -99,13 +161,12 @@ function addRole() {
             console.log(
               `Added role ${answers.title} with salary ${answers.salary} to the ${answers.department} department in the database!`
             );
+            run();
           }
         );
       });
   });
 }
-
-// THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 
 function addEmployee() {
   db.query("SELECT id, title FROM roles", (error, results) => {
@@ -167,14 +228,13 @@ function addEmployee() {
             db.query(query, values, (err, res) => {
               if (err) throw err;
               console.log("Employee added successfully");
+              run();
             });
           });
       }
     );
   });
 }
-// WHEN I choose to update an employee role
-// THEN I am prompted to select an employee to update and their new role and this information is updated in the database
 
 function updateRole() {
   const queryE =
@@ -207,6 +267,7 @@ function updateRole() {
           db.query(queryU, [role.id, employee.id], (err, result) => {
             if (err) throw err;
             console.log("Updated Role");
+            run();
           });
         });
     });
