@@ -173,6 +173,42 @@ function addEmployee() {
     );
   });
 }
+// WHEN I choose to update an employee role
+// THEN I am prompted to select an employee to update and their new role and this information is updated in the database
 
-addEmployee();
-viewEmployees();
+function updateRole() {
+  const queryE =
+    "SELECT employees.id, employees.first_name, employees.last_name, roles.title FROM employees LEFT JOIN roles ON employees.role_id = roles.id";
+  const queryR = "SELECT * FROM roles";
+  db.query(queryE, (error, resE) => {
+    db.query(queryR, (error, resR) => {
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "employee",
+            message: "Select the employee to update:",
+            choices: resE.map((e) => `${e.first_name} ${e.last_name}`),
+          },
+          {
+            type: "list",
+            name: "role",
+            message: "Choose a new role:",
+            choices: resR.map((r) => r.title),
+          },
+        ])
+        .then((answers) => {
+          const employee = resE.find(
+            (e) => `${e.first_name} ${e.last_name}` === answers.employee
+          );
+          const role = resR.find((r) => r.title === answers.role);
+
+          const queryU = "UPDATE employees SET role_id = ? WHERE id = ?";
+          db.query(queryU, [role.id, employee.id], (err, result) => {
+            if (err) throw err;
+            console.log("Updated Role");
+          });
+        });
+    });
+  });
+}
