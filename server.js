@@ -69,6 +69,9 @@ function run() {
         case "View Employees by Department":
           viewEmployees();
           break;
+        case "View the total utilized budget of a department":
+          departmentSalaries();
+          break;
         case "Exit":
           connection.end();
           break;
@@ -299,3 +302,15 @@ function viewEmployees() {
     run();
   });
 }
+
+function departmentSalaries() {
+  const query =
+    "SELECT title, SUM(salary) as total_salary FROM roles GROUP BY title;";
+  db.query(query, (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    run();
+  });
+}
+
+departmentSalaries();
