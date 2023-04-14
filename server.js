@@ -61,10 +61,13 @@ function run() {
           addEmployee();
           break;
         case "View Employees by Manager":
-          updateRole();
+          viewEmployeesByManagers();
           break;
         case "Update an employee role":
           updateRole();
+          break;
+        case "View Employees by Department":
+          viewEmployees();
           break;
         case "Exit":
           connection.end();
@@ -280,6 +283,16 @@ function viewEmployeesByManagers() {
   const query =
     " select  roles.title, employees.first_name, employees.last_name, CONCAT(m.first_name,' ', m.last_name) AS manager_name, departments.name from employees LEFT JOIN employees m ON employees.manager_id = m.id LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN departments ON roles.department_id = departments.id ORDER BY manager_name";
 
+  db.query(query, (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    run();
+  });
+}
+
+function viewEmployees() {
+  const query =
+    "SELECT employees.first_name, employees.last_name, departments.name FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN departments ON roles.department_id = departments.id";
   db.query(query, (err, res) => {
     if (err) throw err;
     console.table(res);
