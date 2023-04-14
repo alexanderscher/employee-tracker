@@ -12,12 +12,11 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
-db.connect((err) => {
-  if (err) throw err;
-  console.log("Connected to the database!");
-  // start the application
-  run();
-});
+// db.connect((err) => {
+//   if (err) throw err;
+//   console.log("Connected to the database!");
+//   run();
+// });
 
 function run() {
   inquirer
@@ -60,6 +59,9 @@ function run() {
           break;
         case "Add an employee":
           addEmployee();
+          break;
+        case "View Employees by Manager":
+          updateRole();
           break;
         case "Update an employee role":
           updateRole();
@@ -271,5 +273,16 @@ function updateRole() {
           });
         });
     });
+  });
+}
+
+function viewEmployeesByManagers() {
+  const query =
+    " select  roles.title, employees.first_name, employees.last_name, CONCAT(m.first_name,' ', m.last_name) AS manager_name, departments.name from employees LEFT JOIN employees m ON employees.manager_id = m.id LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN departments ON roles.department_id = departments.id ORDER BY manager_name";
+
+  db.query(query, (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    run();
   });
 }
