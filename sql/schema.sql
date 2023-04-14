@@ -18,6 +18,10 @@ CREATE TABLE roles (
   ON DELETE SET NULL
 );
 
+SELECT salary, SUM(salary)
+FROM roles
+GROUP BY title;
+
 CREATE TABLE employees (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(300) NOT NULL,
@@ -31,5 +35,3 @@ CREATE TABLE employees (
 
 
 
-
-Error Code: 1064. You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 9
