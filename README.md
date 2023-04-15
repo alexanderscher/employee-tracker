@@ -30,3 +30,6 @@ View a list of all employees, roles, or departments.
 Update an existing employee's role or manager.
 Delete an employee, role, or department.
 Contributing
+
+
+<img width="1113" alt="Screenshot 2023-04-14 at 7 27 20 PM" src="https://user-images.githubusercontent.com/108595129/232178782-825710ec-7824-4435-a8b8-f2e276292f65.png">
