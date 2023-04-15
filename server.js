@@ -12,11 +12,11 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
-// db.connect((err) => {
-//   if (err) throw err;
-//   console.log("Connected to the database!");
-//   run();
-// });
+db.connect((err) => {
+  if (err) throw err;
+  console.log("Connected to the database!");
+  run();
+});
 
 function run() {
   inquirer
@@ -71,6 +71,9 @@ function run() {
           break;
         case "View the total utilized budget of a department":
           departmentSalaries();
+          break;
+        case "Delete Departments | Roles | Employees":
+          deleteData();
           break;
         case "Exit":
           connection.end();
@@ -265,6 +268,7 @@ function updateRole() {
             choices: resR.map((r) => r.title),
           },
         ])
+
         .then((answers) => {
           const employee = resE.find(
             (e) => `${e.first_name} ${e.last_name}` === answers.employee
@@ -313,4 +317,112 @@ function departmentSalaries() {
   });
 }
 
-departmentSalaries();
+function deleteEmployee() {
+  const query = "SELECT * FROM employees;";
+  db.query(query, (err, res) => {
+    if (err) throw err;
+    const employeeList = res.map((employee) => ({
+      name: `${employee.first_name} ${employee.last_name}`,
+      value: employee.id,
+    }));
+    inquirer
+      .prompt({
+        type: "list",
+        name: "id",
+        message: "Select the employee you want to delete:",
+        choices: employeeList,
+      })
+      .then((answers) => {
+        const query = "DELETE FROM employee WHERE id = ?";
+        db.query(query, [answers.id], (err, res) => {
+          if (err) throw err;
+          console.log(`Deleted employee from the database`);
+        });
+      });
+  });
+}
+
+function deleteData() {
+  inquirer
+    .prompt({
+      type: "list",
+      name: "data",
+      message: "What would you like to delete?",
+      choices: ["Employee", "Role", "Department"],
+    })
+    .then((answer) => {
+      switch (answer.data) {
+        case "Employee":
+          deleteEmployee();
+          break;
+        case "Role":
+          deleteRole();
+          break;
+        case "Department":
+          deleteDepartment();
+          break;
+        default:
+          console.log(`Invalid data: ${answer.data}`);
+          start();
+          break;
+      }
+    });
+}
+
+function deleteDepartment() {
+  const query = "SELECT * FROM departments;";
+  db.query(query, (err, res) => {
+    if (err) throw err;
+    const departmentsList = res.map((department) => ({
+      name: `${department.name}`,
+      value: department.id,
+    }));
+    inquirer
+      .prompt({
+        type: "list",
+        name: "id",
+        message: "Select the department you want to delete:",
+        choices: departmentsList,
+      })
+      .then((answers) => {
+        const query = "DELETE FROM departments WHERE id = ?";
+        db.query(query, [answers.id], (err, res) => {
+          if (err) throw err;
+          console.log(`Deleted department from the database`);
+        });
+      });
+  });
+}
+function deleteRole() {
+  const query = "SELECT * FROM roles";
+  db.query(query, (err, res) => {
+    if (err) throw err;
+    const rolesMap = res.map((role) => ({
+      name: `${role.title}`,
+      value: role.id,
+    }));
+
+    inquirer
+      .prompt({
+        type: "list",
+        name: "roleId",
+        message: "Select the role you want to delete:",
+        choices: rolesMap,
+      })
+      .then((answer) => {
+        const query = "DELETE FROM employees WHERE role_id =?";
+
+        db.query(query, [answer.roleId], (err, res) => {
+          if (err) throw err;
+          console.log(`Deleted role from the database`);
+        });
+
+        const query1 = "DELETE FROM roles WHERE id =?";
+
+        db.query(query1, [answer.roleId], (err, res) => {
+          if (err) throw err;
+          console.log(`Deleted role from the database`);
+        });
+      });
+  });
+}
